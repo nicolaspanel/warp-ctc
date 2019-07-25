@@ -57,11 +57,8 @@ if LooseVersion(tf.__version__) >= LooseVersion('1.11'):
 if os.getenv("TF_CXX11_ABI") is not None:
     TF_CXX11_ABI = os.getenv("TF_CXX11_ABI")
 else:
-    warnings.warn("Assuming tensorflow was compiled with C++11 ABI. "
-                  "It is generally true if you are using binary pip package whose version is >= 1.11.0. "
-                  "Also, you need to set (or unset) this environment variable if getting "
-                  "undefined symbol: _ZN10tensorflow... errors")
-    TF_CXX11_ABI = "1"
+    warnings.warn("Assuming tensorflow was not compiled with C++11 ABI. ")
+    TF_CXX11_ABI = "0"
 
 extra_compile_args = ['-std=c++11', '-fPIC', '-D_GLIBCXX_USE_CXX11_ABI=' + TF_CXX11_ABI]
 # current tensorflow code triggers return type errors, silence those for now
@@ -109,8 +106,8 @@ ext = setuptools.Extension('warpctc_tensorflow.kernels',
 
 class build_tf_ext(orig_build_ext):
     def build_extensions(self):
-        try: self.compiler.compiler_so.remove('-Wstrict-prototypes')
-        except ValueError: pass
+        if '-Wstrict-prototypes' in self.compiler.compiler_so:
+            self.compiler.compiler_so.remove('-Wstrict-prototypes')
         orig_build_ext.build_extensions(self)
 
 def discover_test_suite():
@@ -126,16 +123,16 @@ with open(README_PATH, "r") as handle:
     LONG_DESCRIPTION = re.search("#.*([^#]*)##", handle.read()).group(1).strip()
 
 setuptools.setup(
-    name = "warpctc_tensorflow",
-    version = "0.1",
-    description = "TensorFlow wrapper for warp-ctc",
-    long_description = LONG_DESCRIPTION,
-    url = "https://github.com/baidu-research/warp-ctc",
-    author = "Jared Casper",
-    author_email = "jared.casper@baidu.com",
-    license = "Apache",
-    packages = ["warpctc_tensorflow"],
-    ext_modules = [ext],
-    cmdclass = {'build_ext': build_tf_ext},
-    test_suite = 'setup.discover_test_suite',
+    name="warpctc_tensorflow",
+    version="0.1",
+    description="TensorFlow wrapper for warp-ctc",
+    long_description=LONG_DESCRIPTION,
+    url="https://github.com/baidu-research/warp-ctc",
+    author="Jared Casper",
+    author_email="jared.casper@baidu.com",
+    license="Apache",
+    packages=["warpctc_tensorflow"],
+    ext_modules=[ext],
+    cmdclass={'build_ext': build_tf_ext},
+    test_suite='setup.discover_test_suite',
 )

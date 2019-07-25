@@ -6,8 +6,7 @@ from tensorflow.python.ops.nn_grad import _BroadcastMul
 lib_file = imp.find_module('kernels', __path__)[1]
 _warpctc = tf.load_op_library(lib_file)
 
-def ctc(activations, flat_labels, label_lengths, input_lengths,
-        blank_label=0):
+def ctc(activations, flat_labels, label_lengths, input_lengths, blank_label=0):
     '''Computes the CTC loss between a sequence of activations and a
     ground truth labeling.
 
