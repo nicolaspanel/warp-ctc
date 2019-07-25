@@ -5,10 +5,16 @@
 
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
-#include "tensorflow/core/kernels/bounds_check.h"
+#include "tensorflow/core/framework/bounds_check.h"
 #include "tensorflow/core/framework/allocator.h"
+#include "tensorflow/core/framework/shape_inference.h"
+
 #include "ctc.h"
 
+using ::tensorflow::shape_inference::DimensionHandle;
+using ::tensorflow::shape_inference::InferenceContext;
+using ::tensorflow::shape_inference::ShapeHandle;
+using ::tensorflow::Status;
 
 REGISTER_OP("WarpCTC")
     .Input("activations: float32")
@@ -17,7 +23,28 @@ REGISTER_OP("WarpCTC")
     .Input("input_lengths: int32")
     .Attr("blank_label: int = 0")
     .Output("costs: float32")
-    .Output("gradients: float32");
+    .Output("gradients: float32")
+    .SetShapeFn([](::tensorflow::shape_inference::InferenceContext* c) {
+        ShapeHandle activations;
+        ShapeHandle flat_labels;
+        ShapeHandle label_lengths;
+        ShapeHandle input_lengths;
+
+        TF_RETURN_IF_ERROR(c->WithRank(c->input(0), 3, &activations));
+        TF_RETURN_IF_ERROR(c->WithRank(c->input(1), 1, &flat_labels));
+        TF_RETURN_IF_ERROR(c->WithRank(c->input(2), 1, &label_lengths));
+        TF_RETURN_IF_ERROR(c->WithRank(c->input(3), 1, &input_lengths));
+
+        // Get batch size from inputs and sequence_length, and update inputs
+        // with the merged batch_size since it is returned.
+        DimensionHandle batch_size;
+        TF_RETURN_IF_ERROR(c->Merge(c->Dim(activations, 1), c->Dim(input_lengths, 0), &batch_size));
+        TF_RETURN_IF_ERROR(c->ReplaceDim(activations, 1, batch_size, &activations));
+
+        c->set_output(0, c->Vector(batch_size));
+        c->set_output(1, activations);
+        return Status::OK();
+     });
 
 namespace tf = tensorflow;
 
