@@ -8,7 +8,6 @@ import re
 import setuptools
 import sys
 import unittest
-import warnings
 from setuptools.command.build_ext import build_ext as orig_build_ext
 from distutils.version import LooseVersion
 
@@ -54,13 +53,7 @@ include_dirs = tf_includes + warp_ctc_includes
 if LooseVersion(tf.__version__) >= LooseVersion('1.11'):
     include_dirs.append(os.path.join(tf_include, 'external/nsync/public'))
 
-if os.getenv("TF_CXX11_ABI") is not None:
-    TF_CXX11_ABI = os.getenv("TF_CXX11_ABI")
-else:
-    warnings.warn("Assuming tensorflow was not compiled with C++11 ABI. ")
-    TF_CXX11_ABI = "0"
-
-extra_compile_args = ['-std=c++11', '-fPIC', '-D_GLIBCXX_USE_CXX11_ABI=' + TF_CXX11_ABI]
+extra_compile_args = ['-std=c++11', '-fPIC', '-D_GLIBCXX_USE_CXX11_ABI=0']
 # current tensorflow code triggers return type errors, silence those for now
 extra_compile_args += ['-Wno-return-type']
 
