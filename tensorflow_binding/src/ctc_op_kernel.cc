@@ -207,13 +207,6 @@ REGISTER_KERNEL_BUILDER(Name("WarpCTC")
                         .HostMemory("sequence_length")
                         .HostMemory("loss"),
                         CTCLossOpGPU);
-REGISTER_KERNEL_BUILDER(Name("WarpCTC")
-                        .Device(::tensorflow::DEVICE_GPU)
-                        .HostMemory("labels_indices")
-                        .HostMemory("labels_values")
-                        .HostMemory("sequence_length")
-                        .HostMemory("loss"),
-                        CTCLossOpGPU);
 
 #undef EIGEN_USE_GPU
 #endif

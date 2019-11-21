@@ -57,12 +57,15 @@ extra_compile_args = ['-std=c++11', '-fPIC', '-D_GLIBCXX_USE_CXX11_ABI=0']
 # current tensorflow code triggers return type errors, silence those for now
 extra_compile_args += ['-Wno-return-type']
 
-extra_link_args = []
-if LooseVersion(tf.__version__) >= LooseVersion('1.4'):
-    if os.path.exists(os.path.join(tf_src_dir, 'libtensorflow_framework.so')):
-        extra_link_args = ['-L' + tf_src_dir, '-ltensorflow_framework']
+# NB: may require
+# ```
+# $ sudo ln \
+#    -s /home/nicolas/.pyenv/versions/3.6.6/envs/callity/lib/python3.6/site-packages/tensorflow_core/libtensorflow_framework.so.1 \
+#    /usr/lib/libtensorflow_framework.so
+# ```
+extra_link_args = ['-L' + tf_src_dir, '-ltensorflow_framework']
 
-if (enable_gpu):
+if enable_gpu:
     extra_compile_args += ['-DWARPCTC_ENABLE_GPU']
     include_dirs += [os.path.join(os.environ["CUDA_HOME"], 'include')]
 
@@ -97,16 +100,19 @@ ext = setuptools.Extension('warpctc_tensorflow.kernels',
                            extra_compile_args = extra_compile_args,
                            extra_link_args = extra_link_args)
 
+
 class build_tf_ext(orig_build_ext):
     def build_extensions(self):
         if '-Wstrict-prototypes' in self.compiler.compiler_so:
             self.compiler.compiler_so.remove('-Wstrict-prototypes')
         orig_build_ext.build_extensions(self)
 
+
 def discover_test_suite():
     test_loader = unittest.TestLoader()
     test_suite = test_loader.discover('tests', pattern='test_*.py')
     return test_suite
+
 
 # Read the README.md file for the long description. This lets us avoid
 # duplicating the package description in multiple places in the source.
