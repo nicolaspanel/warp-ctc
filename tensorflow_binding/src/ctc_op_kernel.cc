@@ -172,7 +172,7 @@ class CTCLossOpCPU : public CTCLossOpBase {
     }
 };
 
-REGISTER_KERNEL_BUILDER(Name("WarpCTC")
+REGISTER_KERNEL_BUILDER(Name("CTCLoss")
                         .Device(::tensorflow::DEVICE_CPU)
                         .Label("WarpCTC"),
                         CTCLossOpCPU);
@@ -199,7 +199,7 @@ class CTCLossOpGPU : public CTCLossOpBase {
 };
 
 // Register GPU kernel both with and without the label
-REGISTER_KERNEL_BUILDER(Name("WarpCTC")
+REGISTER_KERNEL_BUILDER(Name("CTCLoss")
                         .Device(::tensorflow::DEVICE_GPU)
                         .Label("WarpCTC")
                         .HostMemory("labels_indices")
