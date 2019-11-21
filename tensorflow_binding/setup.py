@@ -117,7 +117,7 @@ with open(README_PATH, "r") as handle:
 
 setuptools.setup(
     name="warpctc_tensorflow",
-    version="0.1",
+    version="0.2",
     description="TensorFlow wrapper for warp-ctc",
     long_description=LONG_DESCRIPTION,
     url="https://github.com/baidu-research/warp-ctc",
