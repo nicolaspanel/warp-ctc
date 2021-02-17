@@ -39,8 +39,7 @@ def ctc(activations, flat_labels, label_lengths, input_lengths, blank_label=0):
     * The label reserved for the blank symbol should be label 0.
 
     '''
-    loss, _ = _warpctc.warp_ctc(activations, flat_labels, label_lengths,
-                                input_lengths, blank_label)
+    loss, _ = _warpctc.warp_ctc(activations, flat_labels, label_lengths, input_lengths, blank_label)
     return loss
 
 
@@ -50,9 +49,9 @@ def _CTCLossGrad(op, grad_loss, _):
     return [_BroadcastMul(grad_loss, grad), None, None, None]
 
 
-@ops.RegisterShape("WarpCTC")
-def _CTCLossShape(op):
-    inputs_shape = op.inputs[0].get_shape().with_rank(3)
-    batch_size = inputs_shape[1]
-    return [batch_size, inputs_shape]
+# @ops.RegisterShape("WarpCTC")
+# def _CTCLossShape(op):
+#     inputs_shape = op.inputs[0].get_shape().with_rank(3)
+#     batch_size = inputs_shape[1]
+#     return [batch_size, inputs_shape]
 

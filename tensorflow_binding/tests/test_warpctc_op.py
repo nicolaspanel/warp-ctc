@@ -1,11 +1,17 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+
 import numpy as np
 from warpctc_tensorflow import ctc
 from tensorflow.python.client import device_lib
 
+
+tf.disable_v2_behavior()
+
+
 def is_gpu_available():
     """Returns whether TensorFlow can access a GPU."""
     return any(x.device_type == 'GPU' for x in device_lib.list_local_devices())
+
 
 class WarpCTCTest(tf.test.TestCase):
 

@@ -63,7 +63,8 @@ extra_compile_args += ['-Wno-return-type']
 #    -s /home/nicolas/.pyenv/versions/3.6.6/envs/callity/lib/python3.6/site-packages/tensorflow_core/libtensorflow_framework.so.1 \
 #    /usr/lib/libtensorflow_framework.so
 # ```
-extra_link_args = ['-L' + tf_src_dir, '-ltensorflow_framework']
+# extra_link_args = ['-L' + tf_src_dir, '-ltensorflow_framework']
+extra_link_args = tf.sysconfig.get_link_flags()
 
 if enable_gpu:
     extra_compile_args += ['-DWARPCTC_ENABLE_GPU']
@@ -96,7 +97,7 @@ ext = setuptools.Extension('warpctc_tensorflow.kernels',
                            include_dirs = include_dirs,
                            library_dirs = [warp_ctc_path],
                            runtime_library_dirs = [os.path.realpath(warp_ctc_path)],
-                           libraries = ['warpctc', 'tensorflow_framework'],
+                           libraries = [],  # 'warpctc', 'tensorflow_framework'
                            extra_compile_args = extra_compile_args,
                            extra_link_args = extra_link_args)
 
